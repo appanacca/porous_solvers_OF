@@ -1,0 +1,130 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Application
+    icoFoam
+
+Description
+    Transient solver for incompressible, laminar flow of Newtonian fluids.
+
+\*---------------------------------------------------------------------------*/
+
+#include "fvCFD.H"
+#include "pisoControl.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+int main(int argc, char *argv[])
+{
+    #include "setRootCase.H"
+    #include "createTime.H"
+    #include "createMesh.H"
+
+    pisoControl piso(mesh);
+
+    #include "createFields.H"
+    #include "initContinuityErrs.H"
+
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    Info<< "\nStarting time loop\n" << endl;
+
+    while (runTime.loop())
+    {
+        Info<< "Time = " << runTime.timeName() << nl << endl;
+
+        #include "CourantNo.H"
+
+        // Momentum predictor
+
+        fvVectorMatrix DEqn
+        (         
+         fvm::ddt(D) 
+         + fvm::div((1/nu_fluid)*phiU,D)
+	 -fvm::laplacian(nu,D)
+	 - delta_ij
+        );
+
+        if (piso.momentumPredictor())
+        {
+            solve(DEqn == -fvc::grad(d));
+        }
+
+        // --- PISO loop
+        while (piso.correct())
+        {
+            volScalarField rAD(1.0/DEqn.A());
+
+            volVectorField HbyA("HbyA", D);
+            HbyA = rAD*DEqn.H();
+            surfaceScalarField phiHbyA
+            (
+                "phiHbyA",
+                (fvc::interpolate(HbyA) & mesh.Sf())
+              + fvc::interpolate(rAD)*fvc::ddtCorr(D, phi)
+		// se lascio sto termine non tornano le dimensioni dell'eq
+		// è associato alla correzione di Richie-Chow
+            );
+
+            adjustPhi(phiHbyA, D, d);
+
+            // Non-orthogonal pressure corrector loop
+            while (piso.correctNonOrthogonal())
+            {
+                // Pressure corrector
+
+                fvScalarMatrix dEqn
+                (
+                    fvm::laplacian(rAD, d) == fvc::div(phiHbyA)
+                );
+
+                dEqn.setReference(dRefCell, dRefValue);
+
+                dEqn.solve(mesh.solver(d.select(piso.finalInnerIter())));
+
+                if (piso.finalNonOrthogonalIter())
+                {
+                    phi = phiHbyA - dEqn.flux();
+                }
+            }
+
+            #include "continuityErrs.H"
+
+            D = HbyA - rAD*fvc::grad(d);
+            D.correctBoundaryConditions();
+        }
+
+        runTime.write();
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
+    }
+
+    Info<< "End\n" << endl;
+
+    return 0;
+}
+
+
+// ************************************************************************* //
