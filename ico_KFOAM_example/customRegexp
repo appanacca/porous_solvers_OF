@@ -1,0 +1,106 @@
+velocityX
+{
+expr "volIntegrate\(sampledSurface\) for U = \((%f%) %f% %f%\)";
+theTitle "<U>";
+titles
+(
+avg_Ux
+);
+}
+
+velocityY
+{
+expr "volIntegrate\(sampledSurface\) for U = \(%f% (%f%) %f%\)";
+theTitle "<U>";
+titles
+(
+avg_Uy
+);
+type slave;
+master velocityX;
+}
+
+velocityZ
+{
+expr "volIntegrate\(sampledSurface\) for U = \(%f% %f% (%f%)\)";
+theTitle "<U>";
+titles
+(
+avg_Uz
+);
+type slave;
+master velocityX;
+}
+
+
+
+pressureX
+{
+expr "pressure : \((%f%) %f% %f%\)";
+theTitle "P force";
+titles
+(
+pressure_X
+);
+}
+
+pressureY
+{
+expr "pressure : \(%f% (%f%) %f%\)";
+theTitle "P force";
+titles
+(
+pressure_Y
+);
+type slave;
+master pressureX;
+}
+
+pressureZ
+{
+expr "pressure : \(%f% %f% (%f%)\)";
+theTitle "P force";
+titles
+(
+pressure_Z
+);
+type slave;
+master pressureX;
+}
+
+
+
+viscousX
+{
+expr "viscous  : \((%f%) %f% %f%\)";
+theTitle "V force";
+titles
+(
+viscous_X
+);
+}
+
+viscousY
+{
+expr "viscous  : \(%f% (%f%) %f%\)";
+theTitle "V force";
+titles
+(
+viscous_Y
+);
+type slave;
+master viscousX;
+}
+
+viscousZ
+{
+expr "viscous  : \(%f% %f% (%f%)\)";
+theTitle "V force";
+titles
+(
+viscous_Z
+);
+type slave;
+master viscousX;
+}
+
