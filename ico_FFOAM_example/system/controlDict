@@ -1,0 +1,126 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     icoGFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.05;
+
+deltaT          1e-5;
+
+writeControl    runTime;
+
+writeInterval   1e-2;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+	
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+
+// ************************************************************************* //
+
+functions
+{
+
+
+force
+{
+    type        forces;
+
+    functionObjectLibs ( "libforces.so" );
+
+	//outputControl outputTime;
+	outputControl   timeStep;
+	outputInterval  1;
+    
+	log         true;
+
+    	patches     ( "fibre" );
+   	
+	//// Name of fields
+	pName p;
+	Uname U;
+
+	//// Density
+	rhoName rhoInf;
+	rhoInf 1.;
+
+	//// Centre of rotation
+	CofR (0 0 0);
+	
+	log true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+
+    avgU
+    {
+        type cellSource ;
+        functionObjectLibs ( "libfieldFunctionObjects.so" ) ;
+        enabled true ;
+        outputControl timeStep ;
+        outputInterval 1;
+        log true ;
+        valueOutput false ;
+        source all ;
+        operation volIntegrate ;
+        fields (D);
+    }
+
+///////////////////////////////////////////////////////////////////////////
+
+minmaxdomain
+{
+	type fieldMinMax;
+	//type banana;
+	functionObjectLibs ("libfieldFunctionObjects.so");
+	enabled true;
+	mode component;
+	outputControl timeStep;
+	outputInterval 1;
+	log true;
+	fields (d D);
+}
+///////////////////////////////////////////////////////////////////////////
+
+
+};
+
+libs
+(
+"libfieldFunctionObjects.so"
+);
+
+
+
+// ************************************************************************* //

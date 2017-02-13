@@ -1,0 +1,3 @@
+sed -i "24ifibre \n { \n type zeroGradient; \n } \n fibre1 \n { \n type zeroGradient; \n } \n fibre2 \n { \n type zeroGradient; \n } \n fibre3 \n { \n type zeroGradient; \n } \n fibre4 \n { \n type zeroGradient; \n } \n" processor{0..3}/0/p
+
+sed -i "24ifibre \n { \n type    fixedValue; \n  value  uniform (0 0 0); \n } \n fibre1 \n { \n type    fixedValue; \n  value  uniform (0 0 0); \n } \n fibre2 \n { \n type    fixedValue; \n  value  uniform (0 0 0); \n } \n fibre3 \n { \n type    fixedValue; \n  value  uniform (0 0 0); \n } \n fibre4 \n { \n type    fixedValue; \n  value  uniform (0 0 0); \n } \n " processor{0..3}/0/U

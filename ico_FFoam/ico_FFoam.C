@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
         fvVectorMatrix DEqn
         (         
          fvm::ddt(D) 
-         + fvm::div((1/nu_fluid)*phiU,D)
-	 -fvm::laplacian(nu,D)
+         + fvm::div(phiU,D)
+	 -fvm::laplacian(nu_fluid,D)
 	 - delta_ij
         );
 
