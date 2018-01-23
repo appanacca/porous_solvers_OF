@@ -12,6 +12,7 @@ IOdictionary transportProperties
     )
 );
 
+// here nu is a dummy value and should be set equal to 1
 dimensionedScalar nu
 (
     "nu",
@@ -19,6 +20,7 @@ dimensionedScalar nu
     transportProperties.lookup("nu")
 );
 
+// nu_fluid is the real fluid kinematic viscosity
 Info<< "Reading nu_fluid\n" << endl;
 dimensionedScalar nu_fluid
 (
@@ -27,6 +29,12 @@ dimensionedScalar nu_fluid
     transportProperties.lookup("nu_fluid")
 );
 
+/*
+the vector delta_ij is a 3x1 vector and it represent the 
+adimensionalized forcing term to each row of the closure problem
+for example to solve for F_11, F_12 and F_13 (first row of the 
+Forcheeimer tensor) it should be set as delta_ij (1 0 0)
+*/
 Info<< "Reading delta_ij\n" << endl;
     dimensionedVector delta_ij
     (

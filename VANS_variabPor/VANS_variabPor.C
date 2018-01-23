@@ -43,13 +43,19 @@ int main(int argc, char *argv[])
 {
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    // this are the numbers of realization in the database metamodel
     int nSamples = 1778498;
+    // number of parameters in the metamodel
 	int dimx = 4;
+    // number of outputs, the 3 elements of the permeability tensor
 	int dimy = 3;
 
+    // matrix for the input parameters
 	Eigen::Matrix<double, Dynamic, Dynamic>  mat(nSamples, dimx);
+    // matrix for the output results
 	Eigen::Matrix<double, Dynamic, Dynamic>  maty(nSamples, dimy);
 
+    // name of the file in which the database is saved
 	char* res = "result.dat";
 	read_file(mat, maty, res);
 
@@ -84,31 +90,25 @@ int main(int argc, char *argv[])
 
         #include "CourantNo.H"
 
-
-scalar old_t(runTime.times()[runTime.times().size()-1].value());
-word old_t_word = name(old_t);
-//Info << "this is my old time-step: " << old_t_word << endl;
-
-
-
-//	cout << "nn: " << "(" << mat(a,0) << ", " << mat(a,1) << ", " << mat(a,2) << ", " << mat(a,3) << ")" << endl;
-//	cout << "K: " << "(" << maty(a,0) << ", " << maty(a,1) << ", " << maty(a,2)  << ")" << endl;
-
+// this is a flag that "activate", or not, the metamodelling procedure
 scalar flag_k_update = readScalar(transportProperties.lookup("k_update"));
 
 
 
 if (flag_k_update == 1){ 
     forAll(K, j){
+        // search through only the porous cells
         if( K[j].xx() != 0)
         {
-
+            // this check is done for symmetry reason
+            // beacuse in this case the 11 and 22 components has to be switched
             if(std::fabs(angle_zx[j]) > 45){
         		query_pt[1] = std::fabs(angle_zx[j]);
         		query_pt[2] = std::fabs(angle_yx[j]); 
         		query_pt[0] = reynolds[j]; 
         		query_pt[3] = por[j]; 
 
+                // search in the database the best fit for the 4 parameters above
                 double a = kdtree_search<double>(mat_index, query_pt);
     	        K[j].xx() = maty(a,1);
                 K[j].yy() = maty(a,2);
@@ -129,24 +129,21 @@ if (flag_k_update == 1){
 }
 else{Info << "Not updating K" << endl;}
 
-
+// this two operations need to be done before the matrix assembly
+// becouse the operators fvc::Sc
 volVectorField KU = K & U;
-
-volVectorField porU = por * U;
-
-volVectorField gradPorgradU = (fvc::grad(U) & fvc::grad(por) );
 
 
         fvVectorMatrix UEqn
         (
             fvm::ddt(U)
-          + (1/por)*fvm::div(phi*phiPor, U)
-          - fvm::laplacian(nu, U)
-          - (nu/por)* (fvc::grad(U) & fvc::grad(por)) //gradPorgradU
-          - (nu/por)*fvc::laplacian(por) * U
-	      + fvc::Sp(por*nu*(1/(LenRef*LenRef)),KU)
-          - gravity 
-
+            + (1/por)*fvm::div(phi*phiPor, U)
+            - fvm::laplacian(nu, U)
+            - (nu/por)* (fvc::grad(U) & fvc::grad(por)) 
+            // the grad is explicit because the implicit version is not present in OF
+            - (nu/por)*fvc::laplacian(por) * U
+	        + fvc::Sp(por*nu*(1/(LenRef*LenRef)),KU)
+            - gravity 
         );
 
         if (piso.momentumPredictor())

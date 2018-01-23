@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
 
         fvVectorMatrix DEqn
         (         
-         fvm::ddt(D)
-	 +fvm::div(phi,D)
-	 -fvm::laplacian(nu,D)
-	 -delta_ij
+           fvm::ddt(D)
+	       +fvm::div(phi,D)
+	       -fvm::laplacian(nu,D)
+	       -delta_ij
         );
 
         if (piso.momentumPredictor())
@@ -82,8 +82,6 @@ int main(int argc, char *argv[])
                 "phiHbyA",
                 (fvc::interpolate(HbyA) & mesh.Sf())
               + fvc::interpolate(rAD)*fvc::ddtCorr(D, phi)
-		// se lascio sto termine non tornano le dimensioni dell'eq
-		// è associato alla correzione di Richie-Chow
             );
 
             adjustPhi(phiHbyA, D, d);

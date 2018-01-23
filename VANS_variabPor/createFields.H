@@ -1,162 +1,166 @@
-    Info<< "Reading transportProperties\n" << endl;
+Info<< "Reading transportProperties\n" << endl;
 
-    IOdictionary transportProperties
+IOdictionary transportProperties
+(
+    IOobject
     (
-        IOobject
-        (
-            "transportProperties",
-            runTime.constant(),
-            mesh,
-            IOobject::MUST_READ_IF_MODIFIED,
-            IOobject::NO_WRITE
-        )
-    );
+        "transportProperties",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
 
-    dimensionedScalar nu
-    (
-        transportProperties.lookup("nu")
-    );
+dimensionedScalar nu
+(
+    transportProperties.lookup("nu")
+);
 
-    dimensionedScalar LenRef
-    (
-        transportProperties.lookup("LenRef")
-    );
-
+// reference lenght of the porous REV
+dimensionedScalar LenRef
+(
+    transportProperties.lookup("LenRef")
+);
 
 
-
+// is an optional vector representing a constant volume force
+// like gravity or a mean pressure gradient
 Info<< "Reading field gravity\n" << endl;
-    dimensionedVector gravity
+dimensionedVector gravity
+(
+    transportProperties.lookup("gravity")
+);
+
+
+Info<< "Reading field p\n" << endl;
+volScalarField p
+(
+    IOobject
     (
-        transportProperties.lookup("gravity")
-    );
+        "p",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
-
-    Info<< "Reading field p\n" << endl;
-    volScalarField p
+//instantiation of the  scalarVolField porosity por
+Info<< "Reading field porosity\n" << endl;
+volScalarField por
+(
+    IOobject
     (
-        IOobject
-        (
-            "p",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+        "por",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
-    Info<< "Reading field porosity\n" << endl;
-    volScalarField por
+
+Info<< "Reading field U\n" << endl;
+volVectorField U
+(
+    IOobject
     (
-        IOobject
-        (
-            "por",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+        "U",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
-
-    Info<< "Reading field U\n" << endl;
-    volVectorField U
+// instantiation of the volTensorField permeability K
+Info<< "Reading field K\n" << endl;
+volTensorField K
+(
+    IOobject
     (
-        IOobject
-        (
-            "U",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+        "K",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
-    Info<< "Reading field K\n" << endl;
-    volTensorField K
+
+
+// instantiation of the scalar angle in degrees between the x and y 
+// component of the velocity field U
+Info<< "Reading field angle_yx\n" << endl;
+volScalarField angle_yx
+(
+    IOobject
     (
-        IOobject
-        (
-            "K",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+        "angle_yx",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
-
-
-
-    Info<< "Reading field angle_yx\n" << endl;
-    volScalarField angle_yx
+// instantiation of the scalar angle in degrees between the x and z 
+// component of the velocity field U
+Info<< "Reading field angl_zx\n" << endl;
+volScalarField angle_zx
+(
+    IOobject
     (
-        IOobject
-        (
-            "angle_yx",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+        "angle_zx",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
-
-    Info<< "Reading field angl_zx\n" << endl;
-    volScalarField angle_zx
+// instantiation of the pore Reynolds number in each REV 
+Info<< "Reading field reynolds\n" << endl;
+volScalarField reynolds
+(
+    IOobject
     (
-        IOobject
-        (
-            "angle_zx",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
-
-    Info<< "Reading field reynolds\n" << endl;
-    volScalarField reynolds
-    (
-        IOobject
-        (
-            "reynolds",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
-
-
-
+        "reynolds",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
 
 
 #   include "createPhi.H"
 
- Info<< "Reading/calculating face flux field phi= U*por\n" << endl;
- 
- surfaceScalarField phiPor
- (
-     IOobject
-     (
-         "phiPor",
-         runTime.timeName(),
-         mesh,
-         IOobject::READ_IF_PRESENT,
-         IOobject::AUTO_WRITE
-     ),
-     linearInterpolate(por) //* mesh.Sf()
- );
+// the product por*U needs to be computed like this due to implementation
+// of the div operator
+Info<< "Reading/calculating face flux field phi= U*por\n" << endl;
 
+surfaceScalarField phiPor
+(
+    IOobject
+    (
+        "phiPor",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    linearInterpolate(por) //* mesh.Sf()
+);
 
-    label pRefCell = 0;
-    scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
+label pRefCell = 0;
+scalar pRefValue = 0.0;
+setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);

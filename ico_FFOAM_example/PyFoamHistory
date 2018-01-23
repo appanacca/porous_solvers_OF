@@ -1,2 +1,0 @@
-Wed Nov  2 16:33:18 2016 by nluminar in eoslogin4 :Application: pyFoamPrepareCase.py . --parameter-file=parameters.basic  | with cwd /tmpdir/nluminar/parametric_K_database/mesh_n50  |  
-Wed Nov  2 17:04:07 2016 by nluminar in eoslogin4 :Application: pyFoamPrepareCase.py . --no-mesh-create --parameter-file=parameters.basic  | with cwd /tmpdir/nluminar/parametric_K_database/t0_f0_g1006_n50  |  

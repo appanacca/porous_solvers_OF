@@ -41,11 +41,6 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
     bool writeResults = !args.optionFound("noWrite");
        
-    //args.addOption("scale_factor");
-
-   //double scale_F ;//= 5.473e-2; // args.optionRead<scalar>("scale_factor"); 
-
-     //scalar scale_F = args.optionRead<scalar>("scale_factor");
 
     IOdictionary transportProperties
     (
@@ -89,6 +84,13 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 
                 double por_max = porosity.value();
                 double z_itf =0;
+
+                /*
+					the idea is to set a scalar value named z_itf that define the interface
+					between the porous media and the free flow
+
+                */
+
 
                 if(  ((mesh.C()[j][0]) >= 0) &&  ((mesh.C()[j][0]) <= 0.3214)   ){
                     double x = mesh.C()[j][0]*28;
@@ -139,6 +141,10 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
                     z_itf = (1./28.)*std::max(0., (56.390 -2.0105*x +0.016449*x*x +0.000026749*x*x*x) );
                 }
                 
+                /*
+					Once the value z_itf is set is possible to use it in conjuction to the vertical coordinate
+					of the cell center mesh.C()[j][1]
+                */
 
 
                 if( ((mesh.C()[j][1]) <= ((z_itf +LenRef.value()/2)) ) && ( (mesh.C()[j][1]) >= ((z_itf -LenRef.value()/2))) ){

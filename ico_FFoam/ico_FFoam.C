@@ -17,7 +17,7 @@ License
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
-
+    
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -59,10 +59,11 @@ int main(int argc, char *argv[])
 
         fvVectorMatrix DEqn
         (         
-         fvm::ddt(D) 
-         + fvm::div(phiU,D)
-	 -fvm::laplacian(nu_fluid,D)
-	 - delta_ij
+            fvm::ddt(D)  // the temporal term is left for stability reason
+                        // but at convergence it will be equal to zero
+            + fvm::div(phiU*(nu/nu_fluid),D)
+	        -fvm::laplacian(nu,D)
+	        - delta_ij
         );
 
         if (piso.momentumPredictor())
@@ -82,8 +83,6 @@ int main(int argc, char *argv[])
                 "phiHbyA",
                 (fvc::interpolate(HbyA) & mesh.Sf())
               + fvc::interpolate(rAD)*fvc::ddtCorr(D, phi)
-		// se lascio sto termine non tornano le dimensioni dell'eq
-		// è associato alla correzione di Richie-Chow
             );
 
             adjustPhi(phiHbyA, D, d);
