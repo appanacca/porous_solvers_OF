@@ -114,16 +114,17 @@ if (flag_k_update == 1){
                 K[j].yy() = maty(a,2);
                 K[j].zz() = maty(a,0);
             }
-
-        	query_pt[1] = std::fabs(angle_zx[j]); 
-        	query_pt[2] = std::fabs(angle_yx[j]); 
-        	query_pt[0] = reynolds[j]; 
-        	query_pt[3] = por[j]; 
-
-            double a = kdtree_search<double>(mat_index, query_pt);   
-    	    K[j].xx() = maty(a,0);
-            K[j].yy() = maty(a,2);
-            K[j].zz() = maty(a,1);
+            else{
+        	    query_pt[1] = std::fabs(angle_zx[j]);  
+            	query_pt[2] = std::fabs(angle_yx[j]);  
+            	query_pt[0] = reynolds[j];     
+            	query_pt[3] = por[j];  
+    
+                double a = kdtree_search<double>(mat_index, query_pt);      
+        	    K[j].xx() = maty(a,0); 
+                K[j].yy() = maty(a,2);  
+                K[j].zz() = maty(a,1);  
+            }   
         }
     }
 }
