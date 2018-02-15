@@ -1,3 +1,0 @@
-set_K_hill_y.C
-
-EXE = $(FOAM_USER_APPBIN)/set_K_hill_y

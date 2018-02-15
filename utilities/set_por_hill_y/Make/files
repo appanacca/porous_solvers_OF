@@ -1,3 +1,0 @@
-set_por_hill_y.C
-
-EXE = $(FOAM_USER_APPBIN)/set_por_hill_y

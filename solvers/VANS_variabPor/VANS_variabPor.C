@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	Eigen::Matrix<double, Dynamic, Dynamic>  maty(nSamples, dimy);
 
     // name of the file in which the database is saved
-	char* res = "result.dat";
+	char* res = "kriging_K.dat";
 	read_file(mat, maty, res);
 
 	KDTreeEigenMatrixAdaptor< Eigen::Matrix<double,Dynamic,Dynamic>,nanoflann::metric_L2> mat_index(mat, 20 );
