@@ -1,0 +1,11 @@
+D3 	on;
+D2	off;
+
+theta 	0;
+phi 	0;
+g	1006;
+porosity  0.6073009183;
+
+n_elem_mesh   50;
+
+nproc 20;

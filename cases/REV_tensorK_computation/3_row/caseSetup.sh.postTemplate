@@ -1,0 +1,3 @@
+rm 0/p.template 0/U.template
+decomposePar 
+mpirun -n |- nproc -| renumberMesh -overwrite -parallel

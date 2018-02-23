@@ -1,0 +1,78 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes  // time discretization
+{
+	//default	Euler;  //first-order explicit, bounded, diffusive
+	//default	CrankNicolson 0.6;	// second order implicit (depends on blending factor), bounded/unbounded
+	default		backward; // second order, implicit, possible unbounded
+}
+
+gradSchemes // gradient at cell centers discret, associated also to convective term.
+{
+// need to use TVD schemes when in precence of high gradients or high convection
+   	//default	Gauss linear;  //for the order and boundedness see below in divSchemes
+	//default	fourt;
+	//default	leastSquares;
+	//default	limitedVanLeer;
+	default		cellMDLimited Gauss linear 0.5; //here the Gauss linear can be any method, the factor at the end is mean to turn on/off the limiter
+}
+
+divSchemes // convective term discretiz.
+{
+// need to use TVD schemes when in precence of high gradients or high convection
+	//default       Gauss linear;  //second-order, unbounded
+	div(phi,U)	Gauss linearUpwind grad(U); // second-order, bounded, use the gradScheme above to compute grad(U) 
+	//div(phi,U)	Gauss limitedLinearV 1; // second order, unbounded (but more stable than pure linear), the V at the end is a special scheme for vectors in this case the velocity U
+	//div(phi,U)	Gauss upwind; //fist-order
+	//div(phi,U)	vanLeer; //second-order, TVD bounded
+}
+
+laplacianSchemes  // diffusive term discr.
+{
+// here Gauss is the only option, but linear can be any method of the above
+// but take in mind that is used for the interpolation of the diffusion coefficient
+    default	Gauss linear corrected; //2-ord with non-ortho corrections
+    //default 	Gauss linear limited 1; //2-ord with non-ortho corrections
+    //default 	Gauss linear orthogonal; //2-ord no correction for purely hexa-mesh
+}
+
+
+snGradSchemes // surface normal gradient evaluated at faces discretization
+{
+// need to be corrected if mesh is skew or non-ortogonal
+// usually use the same method than the laplacian Scheme
+	default	corrected;  
+
+}
+
+
+interpolationSchemes  // how to interpolate face-centered quantity from cell-centered ones
+{
+    default         linear;
+}
+
+
+
+fluxRequired
+{
+    default         no;
+    p               ;
+}
+
+
+// ************************************************************************* //

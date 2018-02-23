@@ -1,0 +1,11 @@
+foamClearPolyMesh
+blockMesh 
+snappyHexMesh -overwrite
+
+
+<!--(if D2)-->
+transformPoints -scale "(0.001 0.001 0.001)"
+extrudeMesh 
+<!--(elif D3)-->
+transformPoints -scale "(0.001 0.001 0.001)"
+<!--(end)-->
