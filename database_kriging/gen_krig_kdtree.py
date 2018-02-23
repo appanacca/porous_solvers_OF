@@ -1,15 +1,9 @@
 import numpy as np
 import openturns as ot
-from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
-from shutil import copy, move
-import os as os
-import re as re
-#######################
-
 
 ########################
 
-field = np.loadtxt('H_added_symmetric_points.dat', skiprows=0, delimiter=" ")
+field = np.loadtxt('H_added_symmetric_points.dat', skiprows=1, delimiter=" ")
 theta = field[:, 0]
 phi = field[:, 1]
 g = field[:, 2]
