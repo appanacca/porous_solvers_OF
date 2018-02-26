@@ -110,14 +110,15 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     {
         Info<< "Reading por" << endl;
         volScalarField por(porheader, mesh);
+        
+        double por_max = porosity.value();
 
         forAll(por, j){
 
-                double por_max = porosity.value();
                 /*
                     if you want another shape of the interface you need to implement another function like this one
                 */
-                itf_function(Itf.value(), por[j], mesh.C()[j][1], por_max, LenRef.value());
+                itf_function(por[j], mesh.C()[j][1], Itf.value(), por_max, LenRef.value());
 
         }
 

@@ -3,7 +3,7 @@ import openturns as ot
 
 ########################
 
-field = np.loadtxt('H_added_symmetric_points.dat', skiprows=1, delimiter=" ")
+field = np.loadtxt('H_database.dat', skiprows=1, delimiter=" ")
 theta = field[:, 0]
 phi = field[:, 1]
 g = field[:, 2]
