@@ -53,10 +53,10 @@ void read_file(Eigen::MatrixBase<Der> &mat, Eigen::MatrixBase<Der> &maty, const 
 	int i = 0;
    	while( i<mat.rows())
    	{
-   		infile >>th >> ph >> re >> po >> h11 >> h22 >> h33;
-     	mat(i,0) = th;
-     	mat(i,1) = ph;
-     	mat(i,2) = re;
+   		infile >>re >> th >> ph >> po >> h11 >> h22 >> h33;
+     	mat(i,0) = re;
+     	mat(i,1) = th;
+     	mat(i,2) = ph;
      	mat(i,3) = po;
      	maty(i,0) = h11;
      	maty(i,1) = h22;

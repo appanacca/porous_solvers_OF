@@ -103,9 +103,9 @@ if (flag_k_update == 1){
             // this check is done for symmetry reason
             // beacuse in this case the 11 and 22 components has to be switched
             if(std::fabs(angle_zx[j]) > 45){
+        		query_pt[0] = reynolds[j]; 
         		query_pt[1] = std::fabs(angle_zx[j]);
         		query_pt[2] = std::fabs(angle_yx[j]); 
-        		query_pt[0] = reynolds[j]; 
         		query_pt[3] = por[j]; 
 
                 // search in the database the best fit for the 4 parameters above
@@ -115,9 +115,9 @@ if (flag_k_update == 1){
                 K[j].zz() = maty(a,0);
             }
             else{
+            	query_pt[0] = reynolds[j];     
         	    query_pt[1] = std::fabs(angle_zx[j]);  
             	query_pt[2] = std::fabs(angle_yx[j]);  
-            	query_pt[0] = reynolds[j];     
             	query_pt[3] = por[j];  
     
                 double a = kdtree_search<double>(mat_index, query_pt);      
